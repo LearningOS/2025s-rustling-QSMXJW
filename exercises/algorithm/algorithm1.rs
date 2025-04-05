@@ -2,7 +2,7 @@
 	single linked list merge
 	This problem requires you to merge two ordered singly linked lists into one ordered singly linked list
 */
-// I AM NOT DONE
+
 
 use std::fmt::{self, Display, Formatter};
 use std::ptr::NonNull;
@@ -69,15 +69,53 @@ impl<T> LinkedList<T> {
             },
         }
     }
-	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
-	{
-		//TODO
-        println!("Just Test");
-		Self {
-            length: 0,
-            start: None,
-            end: None,
+
+    fn get_all_value_in_list(&self) -> Vec<Option<T>> 
+        where T: Clone + Ord
+    {
+        let mut v = Vec::new();
+        let mut p = self.start;
+        while let Some(node) = p {
+            unsafe {
+                v.push(Some((*node.as_ptr()).val.clone()));
+                p = (*node.as_ptr()).next;
+            }
         }
+        v
+    }
+
+	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
+        where T: Clone +  Ord
+	{
+		let mut answer = LinkedList::new();
+
+        let mut vec_a = list_a.get_all_value_in_list();
+        let mut vec_b = list_b.get_all_value_in_list();
+
+
+        let mut index_a = 0;
+        let mut index_b = 0;
+        while index_a < vec_a.len() && index_b < vec_b.len() {
+            if vec_a[index_a] < vec_b[index_b] {
+                answer.add(vec_a[index_a].take().unwrap());
+                index_a += 1;
+            }
+            else {
+                answer.add(vec_b[index_b].take().unwrap());
+                index_b += 1;
+            }
+        }
+
+        while index_a < vec_a.len() {
+            answer.add(vec_a[index_a].take().unwrap());
+            index_a += 1;
+        }
+
+        while index_b < vec_b.len() {
+            answer.add(vec_b[index_b].take().unwrap());
+            index_b += 1;
+        }
+        answer
 	}
 }
 
